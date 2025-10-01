@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: purge all the images and cache
+        run: docker system prune -a || true
       - name: Pull image from docker hub
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/finenotes-server:latest
       - name: Delete old container

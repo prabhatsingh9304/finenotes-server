@@ -1,57 +1,75 @@
 # finenotes-server
 
-A Node.js/Express server for the Gifco restaurant discovery platform.
+A Finenotes.AI server for the FineNotes.AI extension.
 
 ## Features
 
-- **Restaurant Management**: Add, search, and manage restaurants
-- **User Authentication**: Secure user authentication with Privy
-- **Follow System**: Users can follow/unfollow restaurants
-- **Personal Notes**: Users can add private notes to restaurants (e.g., "this restaurant is awesome")
-- **Food Tags**: Categorize and search restaurants by food type
-- **Google Places Integration**: Fetch restaurant photos and details
+- **YouTube Transcript Processing**: Extract and parse video transcripts with timestamp support
+- **Notion Integration**: OAuth authentication and page creation for seamless note-taking
+- **Transcript Parsing**: Advanced timestamp-based text extraction from video transcripts
+- **Browser Extension Support**: Backend API server for the FineNotes.AI browser extension
 
-## New Restaurant Follow & Notes API
+## API Endpoints
 
-The server now includes comprehensive follow/unfollow functionality and personal notes system:
+The server provides the following endpoints:
 
-- Follow/unfollow restaurants with toggle functionality
-- Add, edit, and delete personal notes for restaurants (max 1000 characters)
-- Notes are private and only visible to the user who created them
-- Get followed restaurants with or without notes
-- Check follow status and note existence for any restaurant
+### YouTube API (`/youtube`)
 
-See [Restaurant Follow/Unfollow and Notes API Documentation](./docs/RESTAURANT_FOLLOW_API.md) for detailed API usage.
+- **POST** `/youtube/transcript` - Process YouTube video transcripts with timestamp parsing
+
+### Notion API (`/notion`)
+
+- **GET** `/notion/oauth/start` - Initiate Notion OAuth flow
+- **GET** `/notion/oauth/callback` - Handle Notion OAuth callback
+- **POST** `/notion/pages/create` - Create new pages in Notion with notes and content
 
 # Docker
 
+Build the Docker image:
+
+```bash
+docker build -t finenotes/finenotes-server:latest .
 ```
-docker build -t prabhatsingh9304/gifco-server:latest .
+
+Run the container:
+
+```bash
+docker run -d -p 5000:5000 finenotes/finenotes-server:latest
 ```
 
-docker run -d -p 5000:5000 prabhatsingh9304/gifco-server:latest
+Push to registry (optional):
 
-docker push prabhatsingh9304/gifco-server:latest
+```bash
+docker push <your-registry>/finenotes-server:latest
+```
 
-# Deployment YAML
+# Deployment on AWS
 
-# Deployment on aws
+## System Setup
 
+```bash
 sudo apt update && clear
 sudo apt install -y nginx
 sudo systemctl status nginx
+
+```
 
 ## Install Docker
 
 ### Add Docker's official GPG key:
 
+```bash
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
+```
+
 ### Add the repository to Apt sources:
+
+```bash
 
 echo \
  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
@@ -61,30 +79,41 @@ sudo apt-get update
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+```
+
 ### Verify installation
+
+```bash
 
 sudo docker run hello-world
 
+```
+
 ### Add User to docker group
+
+```bash
 
 sudo usermod -aG docker $USER
 newgrp docker
 sudo systemctl restart docker
 
+```
+
 ## Nginx Setup
 
+```bash
 sudo tee /etc/nginx/sites-available/default > /dev/null << EOF
 server {
-server_name dev.gifco.io www.dev.gifco.io;
-client_max_body_size 300M;
+    server_name your-domain.com www.your-domain.com;
+    client_max_body_size 300M;
 
-    access_log /var/log/nginx/gifco.access.log;
-    error_log /var/log/nginx/gifco.error.log;
+    access_log /var/log/nginx/finenotes.access.log;
+    error_log /var/log/nginx/finenotes.error.log;
 
     root /path;
 
     location /api {
-        proxy_pass http://localhost:5000; # Node.js backend port
+        proxy_pass http://localhost:5000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'Upgrade';
@@ -100,17 +129,25 @@ client_max_body_size 300M;
 }
 EOF
 
+```
+
 ## Run Pipeline
 
 ## Restart nginx
 
+```bash
+
 sudo systemctl restart nginx
 sudo systemctl status nginx
 
+```
+
 ## SSL Certificates
 
+```bash
 sudo snap install core; sudo snap refresh core
 sudo apt remove certbot
 sudo snap install --classic certbot
 sudo systemctl reload nginx
-sudo certbot --nginx -d dev.gifco.io
+sudo certbot --nginx -d your-domain.com
+```
