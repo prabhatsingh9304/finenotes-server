@@ -23,6 +23,16 @@ The server provides the following endpoints:
 - **GET** `/notion/oauth/callback` - Handle Notion OAuth callback
 - **POST** `/notion/pages/create` - Create new pages in Notion with notes and content
 
+## Environment Variables
+
+The following environment variables are required for the server to function properly:
+
+| Variable               | Description                                                                           | Required |
+| ---------------------- | ------------------------------------------------------------------------------------- | -------- |
+| `NOTION_CLIENT_ID`     | Your Notion OAuth application client ID                                               | Yes      |
+| `NOTION_CLIENT_SECRET` | Your Notion OAuth application client secret                                           | Yes      |
+| `NOTION_REDIRECT_URI`  | OAuth callback redirect URI (e.g., `http://localhost:5000/api/notion/oauth/callback`) | Yes      |
+
 # Docker
 
 Build the Docker image:
@@ -115,14 +125,14 @@ server {
     location /api {
         proxy_pass http://localhost:5000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'Upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
         proxy_redirect off;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_set_header X-Nginx-Proxy true;
     }
 
